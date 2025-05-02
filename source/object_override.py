@@ -59,6 +59,26 @@ def main():
     import os
 
 
+    cwd = os.getcwd()
+    env_cfg.scene.object = RigidObjectCfg(
+            prim_path="{ENV_REGEX_NS}/Object",
+            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.5, 0, 0.055], rot=[1, 0, 0, 0]),
+            spawn=UsdFileCfg(
+                usd_path=f"{cwd}/assets/Props/beaker/Props/instanceable_meshes.usd",
+                scale=(0.8, 0.8, 0.8),
+                rigid_props=RigidBodyPropertiesCfg(
+                    solver_position_iteration_count=16,
+                    solver_velocity_iteration_count=1,
+                    max_angular_velocity=1000.0,
+                    max_linear_velocity=1000.0,
+                    max_depenetration_velocity=5.0,
+                    disable_gravity=False,
+                ),
+            ),
+        )
+
+
+    
     env_cfg.commands.object_pose.resampling_time_range = (1.0e9, 1.0e9)
     env_cfg.terminations.object_reached_goal = DoneTerm(func=mdp.object_reached_goal)
     env = gym.make(args_cli.task, cfg=env_cfg).unwrapped
