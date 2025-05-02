@@ -1,5 +1,5 @@
-# Chills - #  Isaac Lab Projects
-Project Chills: Chemistry Imitation Learnng Lab Skills for robotic manipulation external extension to IsaacLab
+# Chills - # Chemistry Imitation Learnng Lab Skills in Isaac Lab
+for robotic manipulation in chemistry Labs
 
 ## Overview
 
