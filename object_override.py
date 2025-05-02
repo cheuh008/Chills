@@ -3,15 +3,22 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+"""
+python .\source\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0
+python .\source\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0 --teleop_device spacemouse 
+
+"""
+ 
 import argparse
 from isaaclab.app import AppLauncher
+
 
 # argparse command line arguments
 parser = argparse.ArgumentParser(description="Keyboard teleoperation for Isaac Lab environments.")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
 parser.add_argument("--teleop_device", type=str, default="keyboard", help="Device for interacting with environment")
 parser.add_argument("--task", type=str, default="Isaac-Lift-Cube-Franka-v0", help="Name of the task.")
-parser.add_argument("--sensitivity", type=float, default=1.0, help="Sensitivity factor.")
+parser.add_argument("--sensitivity", type=float, default=5.0, help="Sensitivity factor.")
 parser.add_argument("--enable_pinocchio", action="store_true", default=False, help="Enable Pinocchio.",)
 
 # Isaac Sim app launcher 
@@ -32,7 +39,36 @@ from isaaclab.devices import  Se3Keyboard, Se3SpaceMouse
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab_tasks.manager_based.manipulation.lift import mdp
 from isaaclab_tasks.utils import parse_env_cfg
+from scipy.spatial.transform import Rotation as R
+import os 
 
+def deg2quat_wxyz(euler_deg):
+    quat_xyzw = R.from_euler('xyz', euler_deg, degrees=True).as_quat()
+    quat_wxyz = np.roll(quat_xyzw, 1)  # xyzw -> wxyz
+    return quat_wxyz.tolist()
+
+cwd = os.getcwd()
+Labwear = {
+    "Beaker": {
+        "spawn.usd_path": os.path.join(cwd, "assets", "data", "Props", "Beaker", "beaker.usd"),
+        "spawn.scale": (0.01, 0.01, 0.01),
+        "init_state.pos": [0.5, 0, 0.055],
+        "init_state.rot": deg2quat_wxyz([90, 0, 0]),
+    }
+}
+# Comment the following line to use the default object in the environment
+obj_cfg = list(Labwear.values())[0] # or Labwear[next(iter(Labwear))] 
+
+def obj_override(obj, overrides):
+    for key, value in overrides.items():
+        parts = key.split(".")
+        target = obj
+        for part in parts[:-1]:
+            target = getattr(target, part)
+        setattr(target, parts[-1], value)
+    return obj
+
+   
 def pre_process_actions(
     teleop_data: tuple[np.ndarray, bool] | list[tuple[np.ndarray, np.ndarray, np.ndarray]], num_envs: int, device: str) -> torch.Tensor:
     """ Convert teleop data to  Processed actions as a tensor """
@@ -49,6 +85,12 @@ def main():
     env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs)
     env_cfg.env_name = args_cli.task
     env_cfg.terminations.time_out = None
+
+    # Set the object to be teleoperated
+    if os.path.exists(obj_cfg.get("spawn.usd_path", "")):
+        env_cfg.scene.object = obj_override(env_cfg.scene.object, obj_cfg)
+
+
     env_cfg.commands.object_pose.resampling_time_range = (1.0e9, 1.0e9)
     env_cfg.terminations.object_reached_goal = DoneTerm(func=mdp.object_reached_goal)
     env = gym.make(args_cli.task, cfg=env_cfg).unwrapped
@@ -108,3 +150,5 @@ def main():
 if __name__ == "__main__":
     main()
     simulation_app.close()
+
+
