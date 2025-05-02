@@ -172,6 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+<<<<<<< HEAD
 # C++
 **/cmake-build*/
 **/build*/
@@ -237,3 +238,5 @@ _build
 
 # Teleop Recorded Dataset
 datasets
+=======
+>>>>>>> f38e1ab (initial commmit)
