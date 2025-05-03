@@ -49,17 +49,27 @@ def deg2quat_wxyz(euler_deg):
 cwd = os.getcwd()
 Labwear = {
     "Beaker": {
-        "spawn.usd_path": os.path.join(cwd, "assets", "data", "Props", "Beaker", "beaker.usd"),
+        "spawn.usd_path": os.path.join(cwd, "assets", "Beaker.usd"),
         "spawn.scale": (0.01, 0.01, 0.01),
         "init_state.pos": [0.5, 0, 0.055],
         "init_state.rot": deg2quat_wxyz([90, 0, 0]),
     }, 
-    "Conical_Flask": {
-        "spawn.usd_path": os.path.join(cwd, "assets", "data", "Props", "con_flask", "con_flask.usd"),
+    "Round_Bot": {
+        "spawn.usd_path": os.path.join(cwd, "assets", "round_bot.usd"),
+        "spawn.scale": (0.01, 0.01, 0.01),
+        "init_state.pos": [0.5, 0, 0.055],
+        "init_state.rot": deg2quat_wxyz([90, 0, 0]),
     },
+    "Conical_flask": {
+        "spawn.usd_path": os.path.join(cwd, "assets", "con_flask.usd"),
+        "spawn.scale": (0.01, 0.01, 0.01),
+        "init_state.pos": [0.5, 0, 0.055],
+        "init_state.rot": deg2quat_wxyz([0, 0, 90]),
+    },
+    
 }
 # Comment the following line to use the default object in the environment
-obj_cfg = list(Labwear.values())[1] # or Labwear[next(iter(Labwear))] 
+obj_cfg = list(Labwear.values())[2] # or Labwear[next(iter(Labwear))] 
 
 def obj_override(obj, overrides):
     for key, value in overrides.items():
