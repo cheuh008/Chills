@@ -10,8 +10,7 @@ python .\source\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0 --tel
 """
  
 import argparse
-from isaaclab.app import AppLauncher
-
+from isaaclab.app import AppLauncher 
 
 # argparse command line arguments
 parser = argparse.ArgumentParser(description="Keyboard teleoperation for Isaac Lab environments.")
@@ -32,14 +31,14 @@ simulation_app = app_launcher.app
 
 import torch
 import omni.log
+import isaaclab_tasks   
 import numpy as np
-import gymnasium as gym
-import isaaclab_tasks  # noqa: F401
-from isaaclab.devices import  Se3Keyboard, Se3SpaceMouse
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+import gymnasium as gym 
+from isaaclab.devices import  Se3Keyboard, Se3SpaceMouse 
+from isaaclab.managers import TerminationTermCfg as DoneTerm 
 from isaaclab_tasks.manager_based.manipulation.lift import mdp
 from isaaclab_tasks.utils import parse_env_cfg
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation as R 
 import os 
 
 def deg2quat_wxyz(euler_deg):
@@ -54,10 +53,13 @@ Labwear = {
         "spawn.scale": (0.01, 0.01, 0.01),
         "init_state.pos": [0.5, 0, 0.055],
         "init_state.rot": deg2quat_wxyz([90, 0, 0]),
-    }
+    }, 
+    "Conical_Flask": {
+        "spawn.usd_path": os.path.join(cwd, "assets", "data", "Props", "con_flask", "con_flask.usd"),
+    },
 }
 # Comment the following line to use the default object in the environment
-obj_cfg = list(Labwear.values())[0] # or Labwear[next(iter(Labwear))] 
+obj_cfg = list(Labwear.values())[1] # or Labwear[next(iter(Labwear))] 
 
 def obj_override(obj, overrides):
     for key, value in overrides.items():

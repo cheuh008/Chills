@@ -1,2 +1,0 @@
-
-./isaaclab.bat -p scripts/tools/convert_mesh.py "C:\Users\Administrator\Downloads\beaker.obj" "C:\Users\Administrator\OneDrive - The University of Liverpool\Playground\Chills\assets\data\Props\Beaker\beaker.usd"  --collision-approximation convexDecomposition --mass 0.05

@@ -1,5 +1,18 @@
 {
+    "python.defaultInterpreterPath": "b:\\winiconda3\\envs\\env_isaaclab\\python.exe",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticsSource": "Pyright",
     "python.analysis.extraPaths": [
-      "B:/Playground/WinTrix/IsaacLab/source/"
-    ]
+      "B:\\Playground\\WinTrix\\IsaacLab\\source\\isaaclab",
+      "B:\\winiconda3\\envs\\env_isaaclab\\lib\\site-packages",
+      "B:\\Playground\\WinTrix\\isaacsim\\python_packages\\isaacsim"
+    ],
+    "python.autoComplete.extraPaths": [
+      "B:\\Playground\\WinTrix\\IsaacLab\\source\\isaaclab",
+      "B:\\winiconda3\\envs\\env_isaaclab\\lib\\site-packages",
+      "B:\\Playground\\WinTrix\\isaacsim\\python_packages\\isaacsim"
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+      "reportMissingImports": "none"
+    }
   }
