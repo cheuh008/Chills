@@ -3,9 +3,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# Code based on IsaacLab\scripts\environments\teleoperation\teleop_se3_agent.py
+
 """
-python .\source\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0
-python .\source\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0 --teleop_device spacemouse 
+python .\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0
+python .\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0 --teleop_device spacemouse 
 
 """
  
@@ -17,7 +19,7 @@ parser = argparse.ArgumentParser(description="Keyboard teleoperation for Isaac L
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
 parser.add_argument("--teleop_device", type=str, default="keyboard", help="Device for interacting with environment")
 parser.add_argument("--task", type=str, default="Isaac-Lift-Cube-Franka-v0", help="Name of the task.")
-parser.add_argument("--sensitivity", type=float, default=5.0, help="Sensitivity factor.")
+parser.add_argument("--sensitivity", type=float, default=2.0, help="Sensitivity factor.")
 parser.add_argument("--enable_pinocchio", action="store_true", default=False, help="Enable Pinocchio.",)
 
 # Isaac Sim app launcher 
@@ -41,6 +43,7 @@ from isaaclab_tasks.utils import parse_env_cfg
 from scipy.spatial.transform import Rotation as R 
 import os 
 
+# Changes from Euler (360') Angles [x,y,z] to Isaac Quaternion [w,x,y,z] format
 def deg2quat_wxyz(euler_deg):
     quat_xyzw = R.from_euler('xyz', euler_deg, degrees=True).as_quat()
     quat_wxyz = np.roll(quat_xyzw, 1)  # xyzw -> wxyz
@@ -49,29 +52,30 @@ def deg2quat_wxyz(euler_deg):
 cwd = os.getcwd()
 Labwear = {
     "Beaker": {
-        "spawn.usd_path": os.path.join(cwd, "assets", "Beaker.usd"),
+        "spawn.usd_path": os.path.join(cwd, "assets", "beaker", "beaker.usd"),
         "spawn.scale": (0.01, 0.01, 0.01),
         "init_state.pos": [0.5, 0, 0.055],
-        "init_state.rot": deg2quat_wxyz([90, 0, 0]),
+        "init_state.rot": deg2quat_wxyz([90, 0, 0]), # This is upright
     }, 
     "Round_Bot": {
-        "spawn.usd_path": os.path.join(cwd, "assets", "round_bot.usd"),
+        "spawn.usd_path": os.path.join(cwd, "assets", "round_bot", "round_bot.usd"),
         "spawn.scale": (0.01, 0.01, 0.01),
         "init_state.pos": [0.5, 0, 0.055],
-        "init_state.rot": deg2quat_wxyz([90, 0, 0]),
+        "init_state.rot": deg2quat_wxyz([90, 0, 0]), # This is upright
     },
     "Conical_flask": {
-        "spawn.usd_path": os.path.join(cwd, "assets", "con_flask.usd"),
+        "spawn.usd_path": os.path.join(cwd, "assets", "con_flask", "con_flask.usd"),
         "spawn.scale": (0.01, 0.01, 0.01),
         "init_state.pos": [0.5, 0, 0.055],
-        "init_state.rot": deg2quat_wxyz([0, 0, 90]),
+        "init_state.rot": deg2quat_wxyz([0, 0, 90]), # This is upright
     },
     
 }
 # Comment the following line to use the default object in the environment
-obj_cfg = list(Labwear.values())[2] # or Labwear[next(iter(Labwear))] 
+obj_cfg = list(Labwear.values())[0] # or Labwear[next(iter(Labwear))] 
 
-def obj_override(obj, overrides):
+def obj_override(obj : object, overrides : dict) -> object:
+    """Dynamically override the object spawn parameters in the environment confg."""
     for key, value in overrides.items():
         parts = key.split(".")
         target = obj
@@ -80,7 +84,6 @@ def obj_override(obj, overrides):
         setattr(target, parts[-1], value)
     return obj
 
-   
 def pre_process_actions(
     teleop_data: tuple[np.ndarray, bool] | list[tuple[np.ndarray, np.ndarray, np.ndarray]], num_envs: int, device: str) -> torch.Tensor:
     """ Convert teleop data to  Processed actions as a tensor """
@@ -101,11 +104,12 @@ def main():
     # Set the object to be teleoperated
     if os.path.exists(obj_cfg.get("spawn.usd_path", "")):
         env_cfg.scene.object = obj_override(env_cfg.scene.object, obj_cfg)
-
-
+             
     env_cfg.commands.object_pose.resampling_time_range = (1.0e9, 1.0e9)
     env_cfg.terminations.object_reached_goal = DoneTerm(func=mdp.object_reached_goal)
     env = gym.make(args_cli.task, cfg=env_cfg).unwrapped
+    
+    print(f"Environment: {env}")
 
     # Flags for controlling teleoperation flow
     should_reset_recording_instance = False
