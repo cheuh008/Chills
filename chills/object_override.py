@@ -9,7 +9,11 @@
 python .\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0
 python .\object_override.py --task Isaac-Lift-Cube-Franka-IK-Rel-v0 --teleop_device spacemouse 
 
+use obj_cfg = list(Labwear.values())[0] # or Labwear[next(iter(Labwear))] # Below to chnage the enviorment object
+
 """
+
+# Import base main 
  
 import argparse
 from isaaclab.app import AppLauncher 
@@ -72,7 +76,7 @@ Labwear = {
     
 }
 # Comment the following line to use the default object in the environment
-obj_cfg = list(Labwear.values())[0] # or Labwear[next(iter(Labwear))] 
+obj_cfg = list(Labwear.values())[2] # or Labwear[next(iter(Labwear))] 
 
 def obj_override(obj : object, overrides : dict) -> object:
     """Dynamically override the object spawn parameters in the environment confg."""
