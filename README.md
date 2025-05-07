@@ -1,6 +1,9 @@
 # Chills - # Chemistry Imitation Learnng Lab Skills in Isaac Lab
 for robotic manipulation in chemistry Labs
 
+![Env](https://github.com/cheuh008/Chills/blob/main/images/Picture1.png)
+
+
 ## Overview
 
 This project/repository serves as a template for building projects or extensions based on Isaac Lab.
